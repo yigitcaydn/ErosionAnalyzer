@@ -460,3 +460,4 @@ class ErozyonApp(ctk.CTk):
 if __name__ == "__main__":
     app = ErozyonApp()
     app.mainloop()
+
