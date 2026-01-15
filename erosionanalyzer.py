@@ -14,7 +14,7 @@ from skimage.measure import regionprops
 from scipy.ndimage import label, binary_dilation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-# --- 1. GOOGLE EARTH ENGINE BAŞLATMA ---
+# --- 1. GOOGLE EARTH ENGINE ---
 try:
     ee.Initialize(project='ee-yigitdgp')
 except:
@@ -88,7 +88,7 @@ def analiz_motoru(koordinat, start_year, end_year, log_callback):
             img_start = col_start.median().clip(roi)
             img_end = col_end.median().clip(roi)
         else:
-            log_callback("⚙️ Yöntem: FIRST (Hızlı Mod)...")
+            log_callback("⚙️ Yöntem: FAST (Hızlı Mod)...")
             img_start = col_start.sort('CLOUDY_PIXEL_PERCENTAGE').first().clip(roi)
             img_end = col_end.sort('CLOUDY_PIXEL_PERCENTAGE').first().clip(roi)
 
@@ -119,7 +119,7 @@ def analiz_motoru(koordinat, start_year, end_year, log_callback):
         raw_erosion = is_water_end.And(is_land_start)
         filtered_erosion = raw_erosion.multiply(soil_sand.gt(1)).rename('erosion').toInt8()
 
-        # --- C. RANDOM FOREST ENTEGRASYONU ---
+        # --- C. RANDOM FOREST---
         log_callback("🤖 AI Model: Random Forest Eğitiliyor...")
         
         features_img = ndvi.addBands([mndwi, soil_sand, soil_clay, slope]).unmask(0)
@@ -233,8 +233,7 @@ def open_plot_window(dosya_veri, dosya_img):
                     'rect': rect, 'text': txt, 'type': 'green', 'orig_color': '#00FF00', 'orig_text': f"R:%{avg_risk}", 'active': True
                 })
 
-    # 2. TURUNCU KUTULAR (KOD 2'DEKİ ORİJİNAL MANTIK) 
-    # Burası senin isteğin üzerine Kod 2'deki haline birebir döndürüldü.
+    # 2. TURUNCU KUTULAR  
     eroded_risk_values = risk_map[erosion_map == 1]
     if len(eroded_risk_values) > 0:
         learned_mean = np.mean(eroded_risk_values)
@@ -243,7 +242,7 @@ def open_plot_window(dosya_veri, dosya_img):
     else:
         dynamic_threshold = 40 # Varsayılan
 
-    # --- B. BENZERLİK VE YAKINLIK TARAMASI ---
+    # --- B. BENZERLİKTARAMASI ---
     profile_risk = (risk_map > dynamic_threshold) & (erosion_map == 0)
     proximity_risk = binary_dilation(erosion_map == 1, iterations=5) & (erosion_map == 0)
     
@@ -279,7 +278,7 @@ def open_plot_window(dosya_veri, dosya_img):
 
     # 3. MOR KUTULAR (AI - Random Forest)
     ml_mask = (ml_map == 1) & (erosion_map == 0)
-    label_ml, _ = label(ml_mask) # Hata Düzeltmesi
+    label_ml, _ = label(ml_mask) 
     
     for props in regionprops(label_ml):
         if props.area < 30: continue
