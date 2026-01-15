@@ -1,0 +1,9 @@
+earthengine-api
+customtkinter
+rasterio
+numpy
+matplotlib
+scikit-image
+scipy
+requests
+pillow
